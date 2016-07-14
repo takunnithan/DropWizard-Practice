@@ -2,11 +2,11 @@ package resources;
 
 import com.google.common.base.Optional;
 import models.Animals;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
+import javax.validation.Valid;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 
 /**
@@ -15,6 +15,8 @@ import javax.ws.rs.core.MediaType;
 @Path("/basic")
 @Produces(MediaType.APPLICATION_JSON)
 public class BasicResource {
+
+    Logger logger = LoggerFactory.getLogger(BasicResource.class);
 
     private Animals animal;
     public BasicResource(Animals animal) {
@@ -26,5 +28,13 @@ public class BasicResource {
         animal.setId(1);
         animal.setName(name.get());
         return animal;
+    }
+
+    @POST
+    @Path("/create")
+    public Animals createAnimals(@Valid Animals animal){
+        animal.setMessage("animal is created");
+        logger.info("Validation successful, Animal will be created now");
+        return  animal;
     }
 }
