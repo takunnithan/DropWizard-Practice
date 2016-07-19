@@ -20,6 +20,7 @@ public class DropwizardApplication extends Application<AppConfiguration> {
         animal.setMessage(appConfiguration.getMessage());
         BasicResource resource = new BasicResource(animal);
         environment.jersey().register(resource);
+
     }
 
     @Override

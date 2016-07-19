@@ -18,13 +18,16 @@ public class AppConfiguration extends Configuration {
     @JsonProperty
     private String message;
 
+    @NotEmpty
+    @JsonProperty("couchbase.nodes")
+    private String couchbaseNodes;
+
     @JsonProperty
     public String getMessage() {
         return message;
     }
 
-    @JsonProperty
-    public void setMessage(String message) {
-        this.message = message;
+    public String getCouchbaseNodes() {
+        return couchbaseNodes;
     }
 }
