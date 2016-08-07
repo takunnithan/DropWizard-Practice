@@ -1,8 +1,11 @@
+import com.couchbase.client.java.Cluster;
+import com.couchbase.client.java.CouchbaseCluster;
 import config.AppConfiguration;
 import io.dropwizard.Application;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
-import models.Animals;
+import repositories.couchbase.CouchbaseRepository;
+import repositories.couchbase.Repository;
 import resources.BasicResource;
 
 /**
@@ -16,9 +19,25 @@ public class DropwizardApplication extends Application<AppConfiguration> {
 
     @Override
     public void run(AppConfiguration appConfiguration, Environment environment) throws Exception {
-        Animals animal = new Animals();
-        animal.setMessage(appConfiguration.getMessage());
-        BasicResource resource = new BasicResource(animal);
+
+        /*
+        * CouchBase configuration
+        * */
+        String nodes = appConfiguration.getCouchBaseNode();
+        String password = appConfiguration.getCouchBasePassword();
+        String bucket = appConfiguration.getCouchBaseBucket();
+        Cluster cluster = CouchbaseCluster.create(nodes);
+        Repository repo =
+            new CouchbaseRepository(cluster, bucket, password);
+
+        /*
+        * Setting up resources for dropwizard
+        * */
+        BasicResource resource = new BasicResource(repo);
+
+        /*
+        * Registering resources with the environment
+        * */
         environment.jersey().register(resource);
 
     }

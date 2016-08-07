@@ -1,3 +1,4 @@
-message: Welcome to the first applications!
 #couchbase Configuration
-couchbase.nodes=localhost
+couchbase.nodes: "localhost"
+couchbase.bucket: "Products"
+couchbase.password : "password"

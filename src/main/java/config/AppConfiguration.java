@@ -10,24 +10,31 @@ import org.hibernate.validator.constraints.NotEmpty;
  */
 public class AppConfiguration extends Configuration {
 
-    public AppConfiguration(){
+    public AppConfiguration() {
 
     }
 
     @NotEmpty
-    @JsonProperty
-    private String message;
+    public String couchBaseNode;
 
     @NotEmpty
+    public String couchBaseBucket;
+
+    @NotEmpty
+    public String couchBasePassword;
+
     @JsonProperty("couchbase.nodes")
-    private String couchbaseNodes;
-
-    @JsonProperty
-    public String getMessage() {
-        return message;
+    public String getCouchBaseNode() {
+        return couchBaseNode;
     }
 
-    public String getCouchbaseNodes() {
-        return couchbaseNodes;
+    @JsonProperty("couchbase.bucket")
+    public String getCouchBaseBucket() {
+        return couchBaseBucket;
+    }
+
+    @JsonProperty("couchbase.password")
+    public String getCouchBasePassword() {
+        return couchBasePassword;
     }
 }
