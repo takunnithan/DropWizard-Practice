@@ -1,6 +1,5 @@
 package resources;
 
-import com.google.common.base.Optional;
 import entity.Product;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,11 +8,12 @@ import repositories.couchbase.Repository;
 import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 /**
  * Created by takunnithan on 7/13/2016.
  */
-@Path("/{product}")
+@Path("/product/{product}")
 @Produces(MediaType.APPLICATION_JSON)
 public class BasicResource {
 
@@ -25,6 +25,11 @@ public class BasicResource {
         this.repository = repository;
     }
 
+    /**
+     * <b>Get a product from couchbase</b>
+     * @param productId, String
+     * @return <b>product</b>, Product
+     */
     @GET
     public Product getProduct(@PathParam("product") String productId){
         String documentKey = "product:" + productId;
@@ -32,12 +37,45 @@ public class BasicResource {
         return product;
     }
 
+    /**
+     * <b>Create product document in couchbase</b>
+     * @param productId, String
+     * @param product, Product
+     * @return <b>createdProduct</b>, Product
+     */
+    @POST
+    public Product createProduct(@PathParam("product") String productId,@Valid Product product){
+        Product createdProduct = repository.create(product, Product.class);
+        logger.info("Validation successful, Product is created");
+        return createdProduct;
+    }
 
-//    @POST
-//    @Path("/create")
-//    public Product createProduct(@Valid Product product){
-//        animal.setMessage("animal is created");
-//        logger.info("Validation successful, Animal will be created now");
-//        return  animal;
-//    }
+    /**
+     * <b>Delete a product from couchbase</b>
+     * @param product, Product
+     */
+    @DELETE
+    public String deleteProduct(@Valid Product product){
+        repository.delete(product);
+        return "Product deleted successfully!";
+    }
+
+    /**
+     * Update a product in couchbase
+     * @param productId, String
+     * @param product, Product
+     * @return updatedProduct, Product
+     */
+    /*
+    TODO: Update doesn't work .. needs to be fixed.
+     */
+    @PUT
+    public Response updateProduct(@PathParam("product") String productId, @Valid Product product){
+        Product updatedProduct = null;
+        if(repository.findById(productId, Product.class) != null){
+            updatedProduct = repository.update(product, Product.class);
+        }
+        return Response.status(Response.Status.CREATED).entity(updatedProduct).build();
+    }
+
 }

@@ -1,10 +1,12 @@
 package repositories.couchbase;
 
+import com.couchbase.client.core.CouchbaseException;
 import com.couchbase.client.java.Bucket;
 import com.couchbase.client.java.Cluster;
 import com.couchbase.client.java.document.JsonDocument;
 import com.couchbase.client.java.document.json.JsonObject;
 import com.couchbase.client.java.transcoder.JsonTranscoder;
+import entity.Product;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import repositories.couchbase.jsonconverter.JsonConverter;
@@ -32,11 +34,25 @@ public class CouchbaseRepository implements Repository {
     }
 
     public <T> T create(T entity, Class<T> type) {
-        return null;
+        JsonDocument docOut = null;
+        try {
+            JsonDocument docIn = toJsonDocument(entity);
+            docOut = bucket.insert(docIn);
+        } catch (Exception e) {
+            logger.error("Something went wrong! Product insertion failed.",e);
+        }
+        return fromJsonDocument(docOut, type);
     }
 
     public <T> T update(T entity, Class<T> type) {
-        return null;
+        JsonDocument docUpdated = null;
+        try {
+            JsonDocument docIn = toJsonDocument(entity);
+             docUpdated = bucket.replace(docIn);
+        } catch (Exception e) {
+            logger.error("Updating product failed",e);
+        }
+        return fromJsonDocument(docUpdated, type);
     }
 
     public <T> T upsert(T entity, Class<T> type) {
@@ -44,7 +60,12 @@ public class CouchbaseRepository implements Repository {
     }
 
     public <T> void delete(T entity) {
-
+        try {
+            JsonDocument doc = toJsonDocument(entity);
+            bucket.remove(doc);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 
@@ -75,23 +96,25 @@ public class CouchbaseRepository implements Repository {
         return result;
     }
 
-//    /**
-//     * Converts an object to a JsonDocument
-//     *
-//     * @param source Object to be converted
-//     * @return JsonDocument that represents the specified object
-//     */
-//    protected <T> JsonDocument toJsonDocument(T source) throws Exception {
-//        if (source == null) {
-//            throw new IllegalArgumentException("entity is null");
-//        }
-//        try {
-//            JsonObject content =
-//                transcoder.stringToJsonObject(jsonConverter.toJson(source));
-//            JsonDocument doc = JsonDocument.create(id, content,);
-//            return doc;
-//        } catch (Exception e) {
-//            throw new Exception(e);
-//        }
-//    }
+    /**
+     * Converts an object to a JsonDocument
+     *
+     * @param source Object to be converted
+     * @return JsonDocument that represents the specified object
+     */
+    protected <T> JsonDocument toJsonDocument(T source) throws Exception {
+        if (source == null) {
+            throw new IllegalArgumentException("entity is null");
+        }
+        String docId = "product:" + ((Product) source).getProductId();
+
+        try {
+            JsonObject content =
+                transcoder.stringToJsonObject(jsonConverter.toJson(source));
+            JsonDocument doc = JsonDocument.create(docId, content);
+            return doc;
+        } catch (Exception e) {
+            throw new Exception(e);
+        }
+    }
 }
