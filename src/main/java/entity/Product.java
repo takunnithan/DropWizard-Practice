@@ -1,6 +1,7 @@
 package entity;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.annotations.ApiModelProperty;
 import org.hibernate.validator.constraints.NotEmpty;
 
 /**
@@ -28,6 +29,7 @@ public class Product {
     }
 
     @JsonProperty
+    @ApiModelProperty(value = "Name of the product")
     public String getProductName() {
         return productName;
     }
