@@ -2,7 +2,6 @@ package config;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.dropwizard.Configuration;
-import org.glassfish.jersey.jaxb.internal.XmlCollectionJaxbProvider;
 import org.hibernate.validator.constraints.NotEmpty;
 
 /**

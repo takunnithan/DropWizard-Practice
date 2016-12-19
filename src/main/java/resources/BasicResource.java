@@ -1,10 +1,12 @@
 package resources;
 
 import entity.Product;
+import io.dropwizard.auth.Auth;
 import io.swagger.annotations.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import repositories.couchbase.Repository;
+import security.User;
 
 import javax.validation.Valid;
 import javax.ws.rs.*;
@@ -33,6 +35,7 @@ public class BasicResource {
      * @param productId, String
      * @return <b>product</b>, Product
      */
+    // TODO: Include authentication from database and ROLE based authentication
     @GET
     @ApiOperation(
         value = "Find a product by ID",
@@ -42,7 +45,7 @@ public class BasicResource {
         @ApiResponse(code = 404, message = "Product not found")})
     public Product getProduct(
         @ApiParam(value = "ID of product that needs to be fetched", allowableValues = "range[1,1000]", required = true)
-        @PathParam("product") String productId) {
+        @PathParam("product") String productId, @Auth User user) {
         String documentKey = "product:" + productId;
         Product product = repository.findById(documentKey, Product.class);
         return product;
@@ -66,7 +69,7 @@ public class BasicResource {
      * <b>Delete a product from couchbase</b>
      *
      * @param product, Product
-     */
+//     */
     @DELETE
     public String deleteProduct(@Valid Product product) {
         repository.delete(product);

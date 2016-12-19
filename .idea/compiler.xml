@@ -25,8 +25,8 @@
         <module name="DropWizard" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="DropWizard" target="1.5" />
+    <bytecodeTargetLevel target="1.8">
+      <module name="DropWizard" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>
