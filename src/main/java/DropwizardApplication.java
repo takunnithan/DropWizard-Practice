@@ -33,40 +33,22 @@ public class DropwizardApplication extends Application<AppConfiguration> {
     @Override
     public void run(AppConfiguration appConfiguration, Environment environment) throws Exception {
 
-        /*
-        * CouchBase configuration
-        * */
-        String nodes = appConfiguration.getCouchBaseNode();
-        String password = appConfiguration.getCouchBasePassword();
-        String bucket = appConfiguration.getCouchBaseBucket();
-        Cluster cluster = CouchbaseCluster.create(nodes);
-        Repository repo =
-            new CouchbaseRepository(cluster, bucket, password);
+        // CouchBase configuration
 
-        /*
-        * Setting up resources for dropwizard
-        * */
-        BasicResource resource = new BasicResource(repo);
+        Repository repo = configureCouchbase(environment, appConfiguration);
 
-        /*
-        * Registering resources with the environment
-        * */
-        environment.jersey().register(resource);
+        // Configure Swagger
 
-        logger.info("Configuring Swagger");
         configureSwagger(environment);
 
-        /*
-         *Setting up security
-         */
+        // Configure Security
 
-        environment.jersey().register(new AuthDynamicFeature(
-            new BasicCredentialAuthFilter.Builder<User>()
-            .setAuthenticator(new BasicAuthenticator())
-            .setRealm("SECRET STUFF")
-            .buildAuthFilter()));
-        environment.jersey().register(new AuthValueFactoryProvider.Binder<>(User.class));
+        configureSecurity(environment);
 
+        // Registering resources with the environment
+
+        BasicResource resource = new BasicResource(repo);
+        environment.jersey().register(resource);
     }
 
     @Override
@@ -81,13 +63,29 @@ public class DropwizardApplication extends Application<AppConfiguration> {
     }
 
     /**
+     * Configuring couchbase for the application
+     * @param environment environment variable
+     * @param appConfiguration configuration file
+     * @return Repository object
+     */
+    private Repository configureCouchbase(Environment environment, AppConfiguration appConfiguration ){
+
+        String nodes = appConfiguration.getCouchBaseNode();
+        String password = appConfiguration.getCouchBasePassword();
+        String bucket = appConfiguration.getCouchBaseBucket();
+        Cluster cluster = CouchbaseCluster.create(nodes);
+        return
+            new CouchbaseRepository(cluster, bucket, password);
+    }
+
+    /**
      * Configuration for swagger
      *
      * @param environment, dropwizard environment variable
      */
     private void configureSwagger(Environment environment) {
         // Swagger Resource
-
+        logger.info("Configuring Swagger");
         environment.jersey().register(
             io.swagger.jaxrs.listing.ApiListingResource.class);
         environment.jersey().register(
@@ -99,6 +97,23 @@ public class DropwizardApplication extends Application<AppConfiguration> {
         swaggerConfig.setBasePath("/");
         swaggerConfig.setResourcePackage("resources");
         swaggerConfig.setScan(true);
+    }
+
+    /**
+     * Configure security for Application
+     * @param environment environment variable
+     */
+    private void configureSecurity(Environment environment){
+        environment.jersey().register(new AuthDynamicFeature(
+            new BasicCredentialAuthFilter.Builder<User>()
+            .setAuthenticator(new BasicAuthenticator())
+            .setAuthorizer(new BasicAuthorizer())
+            .setRealm("Secure REALM")
+            .buildAuthFilter()));
+        environment.jersey().register(RolesAllowedDynamicFeature.class);
+
+        // for @Auth annotation
+        environment.jersey().register(new AuthValueFactoryProvider.Binder<>(User.class));
     }
 
 }

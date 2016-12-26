@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import repositories.couchbase.Repository;
 import security.User;
 
+import javax.annotation.security.RolesAllowed;
 import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -36,6 +37,7 @@ public class BasicResource {
      * @return <b>product</b>, Product
      */
     // TODO: Include authentication from database and ROLE based authentication
+    @RolesAllowed("Admin")
     @GET
     @ApiOperation(
         value = "Find a product by ID",

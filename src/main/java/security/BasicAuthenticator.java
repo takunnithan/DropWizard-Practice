@@ -10,12 +10,11 @@ import io.dropwizard.auth.basic.BasicCredentials;
  */
 public class BasicAuthenticator implements Authenticator<BasicCredentials, User> {
 
-    public Optional<User> authenticate(BasicCredentials basicCredentials)
-        throws AuthenticationException {
-        if (basicCredentials.getUsername().equals("username") &&
-            basicCredentials.getPassword().equals("password")) {
-            return Optional.of(new User(true, basicCredentials.getUsername()));
+    @Override
+    public Optional<User> authenticate(BasicCredentials credentials) throws AuthenticationException {
+        if ("password".equals(credentials.getPassword()) & "username".equals(credentials.getUsername())) {
+            return Optional.of(new User(credentials.getUsername(), credentials.getPassword(), "Admin"));
         }
         return Optional.absent();
     }
-}
+    }

@@ -6,9 +6,16 @@ import java.security.Principal;
  * Created by takunnithan on 20-12-2016.
  */
 public class User implements Principal {
-    private String userName;
 
-    private boolean isLoggedIn;
+    private String userName;
+    private String password;
+    private String role;
+
+    public User(String userName, String password, String role) {
+        this.userName = userName;
+        this.password = password;
+        this.role = role;
+    }
 
     public String getName() {
         return userName;
@@ -18,16 +25,19 @@ public class User implements Principal {
         this.userName = userName;
     }
 
-    public boolean isLoggedIn() {
-        return isLoggedIn;
+    public String getPassword() {
+        return password;
     }
 
-    public void setLoggedIn(boolean loggedIn) {
-        isLoggedIn = loggedIn;
+    public void setPassword(String password) {
+        this.password = password;
     }
 
-    public User(boolean isLoggedIn, String userName) {
-        this.isLoggedIn = isLoggedIn;
-        this.userName = userName;
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 }
