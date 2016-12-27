@@ -1,15 +1,18 @@
 import com.couchbase.client.java.Cluster;
 import com.couchbase.client.java.CouchbaseCluster;
 import config.AppConfiguration;
+import dao.UserDao;
 import io.dropwizard.Application;
 import io.dropwizard.assets.AssetsBundle;
 import io.dropwizard.auth.AuthDynamicFeature;
 import io.dropwizard.auth.AuthValueFactoryProvider;
 import io.dropwizard.auth.basic.BasicCredentialAuthFilter;
+import io.dropwizard.jdbi.DBIFactory;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import io.swagger.jaxrs.config.BeanConfig;
 import org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature;
+import org.skife.jdbi.v2.DBI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import repositories.couchbase.CouchbaseRepository;
@@ -41,13 +44,17 @@ public class DropwizardApplication extends Application<AppConfiguration> {
 
         configureSwagger(environment);
 
+        // configure mysql
+
+        UserDao dao = configureMysql(environment, appConfiguration);
+
         // Configure Security
 
-        configureSecurity(environment);
+        configureSecurity(environment, dao);
 
         // Registering resources with the environment
 
-        BasicResource resource = new BasicResource(repo);
+        BasicResource resource = new BasicResource(repo, dao);
         environment.jersey().register(resource);
     }
 
@@ -103,10 +110,10 @@ public class DropwizardApplication extends Application<AppConfiguration> {
      * Configure security for Application
      * @param environment environment variable
      */
-    private void configureSecurity(Environment environment){
+    private void configureSecurity(Environment environment, UserDao dao){
         environment.jersey().register(new AuthDynamicFeature(
             new BasicCredentialAuthFilter.Builder<User>()
-            .setAuthenticator(new BasicAuthenticator())
+            .setAuthenticator(new BasicAuthenticator(dao))
             .setAuthorizer(new BasicAuthorizer())
             .setRealm("Secure REALM")
             .buildAuthFilter()));
@@ -114,6 +121,19 @@ public class DropwizardApplication extends Application<AppConfiguration> {
 
         // for @Auth annotation
         environment.jersey().register(new AuthValueFactoryProvider.Binder<>(User.class));
+    }
+
+    /**
+     * Configuring Mysql for user credentials
+     * @param environment environment variable
+     * @param configuration configuration file
+     * @return UserDao object
+     */
+    private UserDao configureMysql(Environment environment, AppConfiguration configuration){
+        final DBIFactory factory = new DBIFactory();
+        final DBI jdbi = factory.build(environment, configuration.getDataSourceFactory(), "mysql");
+        final UserDao dao = jdbi.onDemand(UserDao.class);
+        return dao;
     }
 
 }

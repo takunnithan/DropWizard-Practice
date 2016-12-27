@@ -1,5 +1,6 @@
 package resources;
 
+import dao.UserDao;
 import entity.Product;
 import io.dropwizard.auth.Auth;
 import io.swagger.annotations.*;
@@ -25,9 +26,11 @@ public class BasicResource {
     Logger logger = LoggerFactory.getLogger(BasicResource.class);
 
     private Repository repository;
+    private UserDao dao;
 
-    public BasicResource(Repository repository) {
+    public BasicResource(Repository repository, UserDao dao) {
         this.repository = repository;
+        this.dao = dao;
     }
 
     /**

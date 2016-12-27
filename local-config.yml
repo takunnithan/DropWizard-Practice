@@ -2,3 +2,9 @@
 couchbase.nodes: "localhost"
 couchbase.bucket: "Products"
 couchbase.password : "password"
+
+database:
+    driverClass: com.mysql.jdbc.Driver
+    user: root
+    password: root
+    url: jdbc:mysql://localhost/dropwizard
