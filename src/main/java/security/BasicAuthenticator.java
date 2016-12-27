@@ -20,6 +20,7 @@ public class BasicAuthenticator implements Authenticator<BasicCredentials, User>
     @Override
     public Optional<User> authenticate(BasicCredentials credentials) throws AuthenticationException {
 
+        // TODO: Add encryption for passwords in the database
         User user = dao.getUser(credentials.getUsername(), credentials.getPassword());
         if (user != null & "Admin".equals(user != null ? user.getRole() : null)) {
             return Optional.of(user);
