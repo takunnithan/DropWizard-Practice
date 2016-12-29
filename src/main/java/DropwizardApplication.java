@@ -2,6 +2,7 @@ import com.couchbase.client.java.Cluster;
 import com.couchbase.client.java.CouchbaseCluster;
 import config.AppConfiguration;
 import dao.UserDao;
+import healthcheck.Healthcheck;
 import io.dropwizard.Application;
 import io.dropwizard.assets.AssetsBundle;
 import io.dropwizard.auth.AuthDynamicFeature;
@@ -56,6 +57,11 @@ public class DropwizardApplication extends Application<AppConfiguration> {
 
         BasicResource resource = new BasicResource(repo, dao);
         environment.jersey().register(resource);
+
+        // Health check
+        final Healthcheck healthCheck =
+            new Healthcheck(appConfiguration.getTemplate());
+        environment.healthChecks().register("template", healthCheck);
     }
 
     @Override

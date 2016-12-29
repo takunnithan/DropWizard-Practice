@@ -30,6 +30,9 @@ public class AppConfiguration extends Configuration {
     @NotNull
     private DataSourceFactory database = new DataSourceFactory();
 
+    @NotEmpty
+    private String template;
+
     @JsonProperty("database")
     public void setDataSourceFactory(DataSourceFactory factory) {
         this.database = factory;
@@ -53,5 +56,10 @@ public class AppConfiguration extends Configuration {
     @JsonProperty("couchbase.password")
     public String getCouchBasePassword() {
         return couchBasePassword;
+    }
+
+    @JsonProperty("template")
+    public String getTemplate() {
+        return template;
     }
 }

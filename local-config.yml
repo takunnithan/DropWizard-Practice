@@ -8,3 +8,5 @@ database:
     user: root
     password: root
     url: jdbc:mysql://localhost/dropwizard
+
+template: "healthcheck-%s"
